@@ -1,0 +1,36 @@
+export const MESSAGES = {
+  AUTH: {
+    REGISTER_SUCCESS: "User registered successfully",
+    LOGIN_SUCCESS: "Login successful",
+    LOGOUT_SUCCESS: "Logged out successfully",
+    EMAIL_EXISTS: "An account with this email already exists",
+    INVALID_CREDENTIALS: "Invalid email or password",
+    UNAUTHORIZED: "Unauthorized access",
+    USER_NOT_FOUND: "User not found",
+  },
+  NOTE: {
+    FETCH_SUCCESS: "Notes fetched successfully",
+    FETCH_SINGLE_SUCCESS: "Note fetched successfully",
+    CREATED_SUCCESS: "Note created successfully",
+    UPDATED_SUCCESS: "Note updated successfully",
+    DELETED_SUCCESS: "Note deleted successfully",
+    NOT_FOUND: "Note not found",
+  },
+  SHARE: {
+    GENERATED_SUCCESS: "Share link generated successfully",
+    REVOKED_SUCCESS: "Share link revoked successfully",
+    ACCESS_SUCCESS: "Note accessed successfully",
+    NO_ACTIVE_LINK: "No active share link found for this note",
+    PASSWORD_REQUIRED_ERR: "Password is required for password-protected share",
+    PASSWORD_INCORRECT: "Incorrect password. Please try again.",
+    LINK_INVALID: "This share link is invalid or does not exist.",
+    LINK_REVOKED: "This share link has been revoked by the owner.",
+    LINK_EXPIRED: "This share link has expired.",
+    LINK_USED: "This one-time share link has already been accessed.",
+    NOTE_DELETED: "Associated note was deleted.",
+  },
+  COMMON: {
+    VALIDATION_ERROR: "Validation error",
+    INTERNAL_SERVER_ERROR: "Internal server error",
+  },
+} as const;
