@@ -10,7 +10,7 @@
 
 ---
 
-## 🛠️ Tech Stack Used
+## Tech Stack Used
 
 | Layer | Technology | Purpose |
 |---|---|---|
@@ -23,7 +23,7 @@
 
 ---
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18.0.0 or higher)
@@ -65,7 +65,7 @@ Open `http://localhost:3000` in your web browser.
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 SNotes uses three main collections in MongoDB via Mongoose:
 
@@ -119,7 +119,7 @@ Stores configuration and security rules for generated share links.
 
 ---
 
-## 🔄 Core Workflows & Logic
+## Core Workflows & Logic
 
 ### 1. Share Link Flow
 1. **Link Creation**: The authenticated note owner selects share options (password, one-time access, expiration date) and sends a `POST /api/share/[token]` request.
@@ -181,7 +181,7 @@ Stores configuration and security rules for generated share links.
 
 ---
 
-## ❓ Technical Architecture Q&A
+## Technical Architecture Q&A
 
 ### Q1: How do you prevent two users from using a one-time link at the same time?
 **Answer**: By executing an atomic `findOneAndUpdate` in MongoDB with the query condition `{ _id: share._id, isUsed: false }` and update payload `{ $set: { isUsed: true } }`. Because MongoDB document updates are atomic, only one concurrent thread will succeed in updating `isUsed` from `false` to `true`. The losing request receives a `null` return value and is immediately rejected with HTTP 410 GONE ("Link already used").
@@ -205,7 +205,7 @@ Stores configuration and security rules for generated share links.
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 ### Authentication
 | Method | Endpoint | Description | Auth Required |
@@ -234,7 +234,7 @@ Stores configuration and security rules for generated share links.
 
 ---
 
-## 📜 Available Scripts
+## Available Scripts
 
 | Command | Action |
 |---|---|
@@ -245,6 +245,6 @@ Stores configuration and security rules for generated share links.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
