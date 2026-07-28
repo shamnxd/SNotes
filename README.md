@@ -1,4 +1,4 @@
-# 🔐 SNotes — Secure Note Sharing Platform
+# SNotes — Secure Note Sharing Platform
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -10,32 +10,32 @@
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
-### 👤 Authentication & Session Management
+### Authentication & Session Management
 - **JWT Authentication**: Auth tokens stored securely in `HttpOnly` cookies to mitigate XSS vulnerabilities.
 - **Password Hashing**: Passwords encrypted using `bcryptjs` with salt rounds.
 - **User Management**: User registration, login, and active session checking (`/api/auth/me`).
 
-### 📝 Note Management
+### Note Management
 - **Full CRUD Operations**: Create, read, update, and delete notes smoothly.
 - **Organized Dashboard**: Clean interface to search, filter, and organize notes.
 - **Strict Authorization**: Access control checks ensuring only note owners can modify or delete notes.
 
-### 🛡️ Secure Note Sharing
+### Secure Note Sharing
 - **Cryptographic Tokens**: Share links use securely generated random UUID tokens.
 - **Public & Password-Protected Sharing**: Choose between public access or set a custom password required to unlock the note.
 - **One-Time Access (Burn After Reading)**: Links automatically expire immediately after the first successful access.
 - **Time-Based Expiration**: Set links to expire automatically after a specified date & time.
 - **Instant Revocation**: Manually revoke active share links at any time to instantly block further access.
 
-### 📊 Analytics & Race-Condition Safety
+### Analytics & Race-Condition Safety
 - **View Tracking**: Accurate real-time counter tracking total successful reads per share link.
 - **Atomic Database Operations**: Prevents race conditions during concurrent access on one-time view links using MongoDB atomic operations.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Component | Technology |
 |---|---|
@@ -48,7 +48,7 @@
 
 ---
 
-## 📁 Project Architecture
+## Project Architecture
 
 ```
 SNotes/
@@ -78,7 +78,7 @@ SNotes/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -127,18 +127,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📡 API Reference
+## API Reference
 
-### 🔐 Authentication
+### Authentication
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
-| `POST` | `/api/auth/register` | Register a new user | ❌ |
-| `POST` | `/api/auth/login` | Authenticate user & set JWT cookie | ❌ |
+| `POST` | `/api/auth/register` | Register a new user | No |
+| `POST` | `/api/auth/login` | Authenticate user & set JWT cookie | No |
 | `POST` | `/api/auth/logout` | Clear authentication cookie | Yes |
 | `GET` | `/api/auth/me` | Fetch authenticated user profile | Yes |
 
-### 📝 Notes
+### Notes
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
@@ -148,18 +148,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `PUT` | `/api/notes/[id]` | Update an existing note | Yes |
 | `DELETE` | `/api/notes/[id]` | Delete a note | Yes |
 
-### 🔗 Share Management
+### Share Management
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
 | `POST` | `/api/share/[token]` | Generate/configure share link | Yes |
-| `GET` | `/api/share/[token]` | Validate & view shared note | ❌ |
-| `POST` | `/api/share/[token]` | Unlock password-protected shared note | ❌ |
+| `GET` | `/api/share/[token]` | Validate & view shared note | No |
+| `POST` | `/api/share/[token]` | Unlock password-protected shared note | No |
 | `DELETE` | `/api/share/[token]` | Revoke an active share link | Yes |
 
 ---
 
-## 🔐 Security Standards
+## Security Standards
 
 - **Server-side Data Validation**: All inputs are checked using **Zod** schemas.
 - **HttpOnly Cookie Storage**: Prevents client-side scripts from reading authentication tokens.
@@ -168,7 +168,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📜 Available Scripts
+## Available Scripts
 
 | Script | Command | Description |
 |---|---|---|
@@ -179,6 +179,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
