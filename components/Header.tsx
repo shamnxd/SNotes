@@ -4,12 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
-import {
-  LogOut,
-  Plus,
-  Search,
-  Bell,
-} from "lucide-react";
+import { LogOut, Plus, Search, Bell } from "lucide-react";
 
 interface HeaderUser {
   id: string;
@@ -45,17 +40,17 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white border-b border-slate-200/80 sticky top-0 z-40">
+    <header className="w-full bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-xs">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3 group shrink-0">
-          <Logo className="w-9 h-9 transition-transform group-hover:scale-105" fill="#00C48C" />
+          <Logo className="w-9 h-9 transition-transform group-hover:scale-105" fill="#2F8CFF" />
           <div>
-            <div className="text-xl font-extrabold tracking-tight text-[#00C48C] leading-none">
-              SecureNote
+            <div className="text-xl font-extrabold tracking-tight text-[#2F8CFF] leading-none">
+              SNotes
             </div>
             <div className="text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
-              Digital Serenity
+              Secure Digital Workspace
             </div>
           </div>
         </Link>
@@ -67,7 +62,7 @@ export default function Header() {
             <input
               type="text"
               placeholder="Search secure notes..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-100/70 focus:bg-white border border-transparent focus:border-[#00C48C] rounded-full text-sm text-slate-800 placeholder-slate-400 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-slate-100/70 focus:bg-white border border-transparent focus:border-[#2F8CFF] rounded-full text-sm text-slate-800 placeholder-slate-400 outline-none transition-all"
             />
           </div>
         )}
@@ -79,13 +74,13 @@ export default function Header() {
               {/* Notification Bell */}
               <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative">
                 <Bell className="w-5 h-5" />
-                <span className="w-2 h-2 bg-[#00C48C] rounded-full absolute top-1.5 right-1.5 ring-2 ring-white" />
+                <span className="w-2 h-2 bg-[#2F8CFF] rounded-full absolute top-1.5 right-1.5 ring-2 ring-white" />
               </button>
 
               {/* Create Note Button */}
               <Link
                 href="/notes/new"
-                className="px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] hover:bg-[#00A876] rounded-xl shadow-sm transition-all flex items-center gap-1.5"
+                className="px-5 py-2 text-sm font-semibold text-white bg-[#2F8CFF] hover:bg-[#1E7BE6] rounded-full shadow-sm transition-all flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>Create Note</span>
@@ -95,7 +90,7 @@ export default function Header() {
 
               {/* User Avatar & Logout */}
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#E6F8F2] text-[#059669] font-bold text-xs flex items-center justify-center ring-2 ring-[#00C48C]/20">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-[#2F8CFF] font-bold text-xs flex items-center justify-center ring-2 ring-[#2F8CFF]/20">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <button
@@ -117,7 +112,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/register"
-                className="px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] hover:bg-[#00A876] rounded-xl shadow-sm transition-all"
+                className="px-5 py-2 text-sm font-semibold text-white bg-[#2F8CFF] hover:bg-[#1E7BE6] rounded-full shadow-sm transition-all"
               >
                 Get Started
               </Link>

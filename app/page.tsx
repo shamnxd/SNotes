@@ -1,141 +1,201 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import {
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { Lock, ArrowRight, Eye, ShieldCheck, Zap, Clock, Key } from "lucide-react";
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
-      {/* Header Navigation */}
-      <header className="w-full bg-white border-b border-slate-200/80 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Logo className="w-9 h-9" fill="#00C48C" />
-            <div>
-              <div className="text-xl font-extrabold tracking-tight text-[#00C48C] leading-none">
-                SecureNote
-              </div>
-              <div className="text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
-                Digital Serenity
-              </div>
-            </div>
-          </div>
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <a href="#features" className="hover:text-slate-900 transition-colors">
+  return (
+    <>
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+          * { font-family: "Geist", sans-serif; }
+        `}
+      </style>
+
+      <div className="flex flex-col items-center bg-gradient-to-b from-[#2F8CFF] to-slate-50 px-4 pt-6 min-h-screen text-slate-800 selection:bg-blue-200">
+        {/* Floating Rounded Pill Navigation */}
+        <nav className="flex items-center justify-between bg-[#4E9EFF] border border-white/40 rounded-full pl-4 md:pl-6 pr-3 md:pr-2 py-1.5 w-full max-w-3xl shadow-lg shadow-blue-500/20 sticky top-4 z-50">
+          <Link href="/" className="flex items-center gap-2">
+            <Logo className="w-8 h-8" fill="#FFFFFF" />
+            <span className="text-white font-extrabold text-xl tracking-tight">SNotes</span>
+          </Link>
+
+          {/* Mobile Overlay Menu */}
+          <div
+            className={`max-md:fixed max-md:bg-black/60 max-md:h-screen max-md:overflow-hidden max-md:transition-[width] max-md:duration-300 max-md:top-0 max-md:left-0 max-md:flex-col max-md:justify-center max-md:backdrop-blur-md flex items-center gap-8 z-50 md:gap-6 md:absolute md:left-1/2 md:-translate-x-1/2 ${
+              mobileOpen ? "max-md:w-full" : "max-md:w-0"
+            }`}
+          >
+            <a
+              href="#"
+              onClick={() => setMobileOpen(false)}
+              className="text-gray-50 hover:text-white text-sm font-medium transition"
+            >
+              Home
+            </a>
+            <a
+              href="#features"
+              onClick={() => setMobileOpen(false)}
+              className="text-gray-50 hover:text-white text-sm font-medium transition"
+            >
               Features
             </a>
-            <a href="#how-it-works" className="hover:text-slate-900 transition-colors">
-              How It Works
-            </a>
-            <a href="#security" className="hover:text-slate-900 transition-colors">
-              Security Architecture
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3 text-sm font-medium">
-            <Link
-              href="/login"
-              className="text-slate-600 hover:text-slate-900 px-3.5 py-2 transition-colors"
+            <a
+              href="#security"
+              onClick={() => setMobileOpen(false)}
+              className="text-gray-50 hover:text-white text-sm font-medium transition"
             >
-              Log in
-            </Link>
+              Security
+            </a>
+            <a
+              href="#pricing"
+              onClick={() => setMobileOpen(false)}
+              className="text-gray-50 hover:text-white text-sm font-medium transition"
+            >
+              Pricing
+            </a>
+
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="md:hidden bg-zinc-950 text-white p-2 rounded-md aspect-square font-medium transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
             <Link
               href="/register"
-              className="px-4 py-2 text-white bg-[#00C48C] hover:bg-[#00A876] rounded-xl font-semibold transition-all shadow-sm active:scale-95"
+              className="hidden md:inline-block bg-white hover:bg-white/90 text-zinc-700 font-semibold px-6 py-2.5 rounded-full text-sm transition cursor-pointer shadow-sm"
             >
               Get Started
             </Link>
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="md:hidden bg-white text-zinc-800 p-1.5 rounded-md aspect-square font-medium transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 12h16" />
+                <path d="M4 18h16" />
+                <path d="M4 6h16" />
+              </svg>
+            </button>
           </div>
-        </div>
-      </header>
+        </nav>
 
-      {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-start text-center px-6 pt-16 pb-20 max-w-5xl mx-auto">
-        {/* Pill Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E6F8F2] border border-[#A7F3D0] text-[#059669] text-xs font-semibold mb-8 shadow-sm">
-          <Sparkles className="w-4 h-4 text-[#00C48C]" />
-          <span>SecureNote 2.0 is now live</span>
-        </div>
-
-        {/* Hero Heading */}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] max-w-4xl mb-6">
-          Encrypted note sharing with{" "}
-          <span className="text-[#00C48C]">Digital Serenity</span>
+        {/* Hero Section */}
+        <h1 className="text-4xl sm:text-5xl md:text-[62px]/18 text-white text-center max-w-[750px] mt-16 md:mt-24 leading-tight font-extrabold tracking-tighter">
+          Design notes & share safely in seconds
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed mb-10 font-normal">
-          Create encrypted notes, protect custom share links with passwords, set one-time burn-after-reading timers, and track view counts securely.
+        <p className="text-sm md:text-base/6.5 text-white/95 text-center max-w-[500px] mt-4 font-normal leading-relaxed">
+          A modern platform to create encrypted notes, protect secret links, set one-time burn timers, and track access safely for modern teams.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-16 w-full sm:w-auto">
+        <div className="flex flex-wrap justify-center gap-4 mt-8">
           <Link
             href="/register"
-            className="w-full sm:w-auto px-7 py-3.5 text-base font-semibold text-white bg-[#00C48C] hover:bg-[#00A876] rounded-xl shadow-md transition-all flex items-center justify-center gap-2 hover:translate-y-[-1px] active:translate-y-0"
+            className="border border-white hover:bg-white/20 text-white text-sm font-semibold px-6 py-3 rounded-full tracking-tight transition cursor-pointer flex items-center gap-2 shadow-sm"
           >
-            <span>Start for free</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            <span>Get started for free</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
             href="/login"
-            className="w-full sm:w-auto px-7 py-3.5 text-base font-semibold text-slate-800 bg-white border border-slate-200/80 hover:bg-slate-50 rounded-xl transition-all shadow-sm text-center"
+            className="bg-white hover:bg-white/90 text-sm font-semibold text-zinc-700 px-6 py-3 rounded-full tracking-tight transition cursor-pointer shadow-sm"
           >
             Access Dashboard
           </Link>
         </div>
 
-        {/* Interactive App Preview */}
-        <div className="w-full max-w-4xl bg-white border border-slate-200/80 rounded-2xl shadow-xl overflow-hidden text-left p-6 sm:p-8">
+        {/* Embedded Interactive Mockup Container */}
+        <div className="mt-12 w-full max-w-[926px] mx-auto border-4 md:border-8 border-blue-300/80 rounded-2xl md:rounded-t-2xl md:rounded-b-none md:border-b-0 overflow-hidden shadow-2xl bg-white text-left p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
               <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <div className="w-3 h-3 rounded-full bg-[#10B981]" />
+              <div className="w-3 h-3 rounded-full bg-emerald-500" />
             </div>
-            <div className="text-xs font-semibold text-[#00C48C] bg-[#E6F8F2] px-3 py-1 rounded-full">
-              SecureNote Preview
+            <div className="text-xs font-semibold text-[#2F8CFF] bg-blue-50 px-3.5 py-1 rounded-full border border-blue-100">
+              SNotes Azure Blue Dashboard
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[#059669] bg-[#E6F8F2] px-2 py-0.5 rounded-full">
+                <span className="text-xs font-semibold text-[#2F8CFF] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
                   One-Time
                 </span>
                 <span className="text-xs text-slate-400">12 Views</span>
               </div>
               <div className="font-bold text-sm text-slate-900">Q4 Product Strategy.md</div>
               <div className="text-xs text-slate-500 line-clamp-2">
-                Internal draft for quarterly roadmap and encrypted credentials.
+                Internal draft for quarterly roadmap and encrypted tokens.
               </div>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-xl space-y-2">
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-600 bg-slate-200 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                  Password Protected
+                </span>
+                <span className="text-xs text-slate-400">45 Views</span>
+              </div>
+              <div className="font-bold text-sm text-slate-900">Project Phoenix - Arch</div>
+              <div className="text-xs text-slate-500 line-clamp-2">
+                Architecture diagrams for cloud migration project.
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-600 bg-slate-200 px-2.5 py-0.5 rounded-full">
                   Time-Based
                 </span>
                 <span className="text-xs text-slate-400">234 Views</span>
               </div>
-              <div className="font-bold text-sm text-slate-900">Team Sync Meeting Notes</div>
+              <div className="font-bold text-sm text-slate-900">Team Sync Notes</div>
               <div className="text-xs text-slate-500 line-clamp-2">
                 Discussion regarding new security protocols and token distribution.
               </div>
             </div>
           </div>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
-        &copy; {new Date().getFullYear()} SecureNote. Digital Serenity Note Sharing.
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="w-full border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500 mt-auto">
+          &copy; {new Date().getFullYear()} SNotes. Powered by Electric Azure Theme.
+        </footer>
+      </div>
+    </>
   );
 }

@@ -88,13 +88,13 @@ export default function NewNotePage() {
           <span>Back to Dashboard</span>
         </button>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm">
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm">
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mb-6">
             Create New Note
           </h1>
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-sm flex items-center gap-2">
+            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -111,7 +111,7 @@ export default function NewNotePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Q4 Product Strategy.md"
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#00C48C] focus:ring-1 focus:ring-[#00C48C] transition-all"
+                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF] transition-all"
               />
             </div>
 
@@ -125,7 +125,7 @@ export default function NewNotePage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Type your sensitive note, secret text, or code snippet here..."
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#00C48C] focus:ring-1 focus:ring-[#00C48C] transition-all leading-relaxed"
+                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF] transition-all leading-relaxed"
               />
             </div>
 
@@ -148,7 +148,7 @@ export default function NewNotePage() {
                     onChange={(e) => setEnableShare(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00C48C]" />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2F8CFF]" />
                 </label>
               </div>
 
@@ -161,9 +161,9 @@ export default function NewNotePage() {
                         type="checkbox"
                         checked={isPasswordProtected}
                         onChange={(e) => setIsPasswordProtected(e.target.checked)}
-                        className="rounded accent-[#00C48C]"
+                        className="rounded accent-[#2F8CFF]"
                       />
-                      <Lock className="w-4 h-4 text-[#00C48C]" />
+                      <Lock className="w-4 h-4 text-[#2F8CFF]" />
                       <span>Password Protect Share Link</span>
                     </label>
 
@@ -173,7 +173,7 @@ export default function NewNotePage() {
                         value={sharePassword}
                         onChange={(e) => setSharePassword(e.target.value)}
                         placeholder="Set custom access password"
-                        className="ml-6 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#00C48C]"
+                        className="ml-6 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#2F8CFF]"
                       />
                     )}
                   </div>
@@ -184,9 +184,9 @@ export default function NewNotePage() {
                       type="checkbox"
                       checked={isOneTime}
                       onChange={(e) => setIsOneTime(e.target.checked)}
-                      className="rounded accent-[#00C48C]"
+                      className="rounded accent-[#2F8CFF]"
                     />
-                    <Zap className="w-4 h-4 text-[#059669]" />
+                    <Zap className="w-4 h-4 text-[#2F8CFF]" />
                     <span>One-Time Link (Burn after 1 view)</span>
                   </label>
 
@@ -200,7 +200,7 @@ export default function NewNotePage() {
                       type="datetime-local"
                       value={expiresAt}
                       onChange={(e) => setExpiresAt(e.target.value)}
-                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-[#00C48C]"
+                      className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-[#2F8CFF]"
                     />
                   </div>
                 </div>
@@ -211,14 +211,14 @@ export default function NewNotePage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-xl transition-all"
+                className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-full transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-6 py-2.5 text-sm font-semibold text-white bg-[#00C48C] hover:bg-[#00A876] rounded-xl shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
+                className="px-6 py-2.5 text-sm font-semibold text-white bg-[#2F8CFF] hover:bg-[#1E7BE6] rounded-full shadow-sm transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? "Saving..." : "Save Note"}</span>
