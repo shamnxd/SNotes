@@ -10,104 +10,44 @@
 
 ---
 
-## Key Features
+## 🛠️ Tech Stack Used
 
-### Authentication & Session Management
-- **JWT Authentication**: Auth tokens stored securely in `HttpOnly` cookies to mitigate XSS vulnerabilities.
-- **Password Hashing**: Passwords encrypted using `bcryptjs` with salt rounds.
-- **User Management**: User registration, login, and active session checking (`/api/auth/me`).
-
-### Note Management
-- **Full CRUD Operations**: Create, read, update, and delete notes smoothly.
-- **Organized Dashboard**: Clean interface to search, filter, and organize notes.
-- **Strict Authorization**: Access control checks ensuring only note owners can modify or delete notes.
-
-### Secure Note Sharing
-- **Cryptographic Tokens**: Share links use securely generated random UUID tokens.
-- **Public & Password-Protected Sharing**: Choose between public access or set a custom password required to unlock the note.
-- **One-Time Access (Burn After Reading)**: Links automatically expire immediately after the first successful access.
-- **Time-Based Expiration**: Set links to expire automatically after a specified date & time.
-- **Instant Revocation**: Manually revoke active share links at any time to instantly block further access.
-
-### Analytics & Race-Condition Safety
-- **View Tracking**: Accurate real-time counter tracking total successful reads per share link.
-- **Atomic Database Operations**: Prevents race conditions during concurrent access on one-time view links using MongoDB atomic operations.
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Framework** | [Next.js 16](https://nextjs.org/) (App Router) | Server-side rendering, API route handlers, and frontend components |
+| **Language** | [TypeScript 5](https://www.typescriptlang.org/) | End-to-end type safety across client and server |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/) | Responsive modern design system |
+| **Database** | [MongoDB](https://www.mongodb.com/) & [Mongoose ODM](https://mongoosejs.com/) | NoSQL database for flexible note and share management |
+| **Authentication** | JSON Web Tokens (`jsonwebtoken`) & `bcryptjs` | HttpOnly cookie-based session authentication and password hashing |
+| **Validation** | [Zod](https://zod.dev/) | Strict runtime schema parsing and payload validation |
 
 ---
 
-## Tech Stack
-
-| Component | Technology |
-|---|---|
-| **Framework** | [Next.js 16](https://nextjs.org/) (App Router) |
-| **Language** | [TypeScript 5](https://www.typescriptlang.org/) |
-| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/) |
-| **Database** | [MongoDB](https://www.mongodb.com/) with [Mongoose ODM](https://mongoosejs.com/) |
-| **Authentication** | JSON Web Tokens (`jsonwebtoken`) & `bcryptjs` |
-| **Validation** | [Zod](https://zod.dev/) schema validation |
-
----
-
-## Project Architecture
-
-```
-SNotes/
-├── app/                      # Next.js App Router Pages & API Routes
-│   ├── api/                  # Backend Route Handlers
-│   │   ├── auth/             # Auth endpoints (login, register, me, logout)
-│   │   ├── notes/            # Note CRUD endpoints
-│   │   └── share/            # Link sharing & access handlers
-│   ├── dashboard/            # Notes dashboard page
-│   ├── login/                # User authentication pages
-│   ├── register/             # User registration page
-│   ├── notes/                # Note creation & editor pages
-│   └── share/[token]/        # Public & protected share access page
-├── components/               # Reusable UI components (Header, layout tools)
-├── context/                  # Project specifications & guidelines
-├── lib/                      # Helper modules & configuration
-│   ├── auth.ts               # JWT signing & verification helpers
-│   ├── env.ts                # Environment variable Zod validation
-│   ├── mongodb.ts            # Mongoose DB connection manager
-│   └── validations.ts        # Zod input validation schemas
-├── models/                   # Mongoose Database Models
-│   ├── Note.ts               # Note document schema
-│   ├── Share.ts              # Share link configuration schema
-│   └── User.ts               # User schema
-└── public/                   # Static assets & icons
-```
-
----
-
-## Quick Start
+## 🚀 Setup Instructions
 
 ### Prerequisites
-
-Ensure you have the following installed on your system:
-- [Node.js](https://nodejs.org/) v18.0.0 or higher
-- [MongoDB](https://www.mongodb.com/) running locally or a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster URL
+- [Node.js](https://nodejs.org/) (v18.0.0 or higher)
+- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+- A running [MongoDB](https://www.mongodb.com/) instance (local or MongoDB Atlas connection string)
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/your-username/SNotes.git
 cd SNotes
 ```
 
 ### 2. Install Dependencies
-
 ```bash
 npm install
 ```
 
-### 3. Set Up Environment Variables
-
-Create a `.env.local` file in the root directory:
-
+### 3. Configure Environment Variables
+Create a `.env.local` file in the root of the project:
 ```env
 # MongoDB Connection String
 MONGODB_URI=mongodb://localhost:27017/snotes
 
-# Secret key for JWT signing
+# Secret Key for JWT Signing
 JWT_SECRET=your_super_secret_jwt_key_here
 
 # App Base URL
@@ -118,19 +58,156 @@ NODE_ENV=development
 ```
 
 ### 4. Run Development Server
-
 ```bash
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open `http://localhost:3000` in your web browser.
 
 ---
 
-## API Reference
+## 🗄️ Database Schema
+
+SNotes uses three main collections in MongoDB via Mongoose:
+
+### 1. User Schema (`models/User.ts`)
+Stores account credentials and user profile information.
+
+```typescript
+{
+  _id: ObjectId,
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true, index: true },
+  password: { type: String, required: true }, // Hashed with bcryptjs
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### 2. Note Schema (`models/Note.ts`)
+Stores user-created note content.
+
+```typescript
+{
+  _id: ObjectId,
+  userId: { type: ObjectId, ref: 'User', required: true, index: true },
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### 3. Share Schema (`models/Share.ts`)
+Stores configuration and security rules for generated share links.
+
+```typescript
+{
+  _id: ObjectId,
+  noteId: { type: ObjectId, ref: 'Note', required: true, index: true },
+  userId: { type: ObjectId, ref: 'User', required: true, index: true },
+  token: { type: String, required: true, unique: true, index: true },
+  isPasswordProtected: { type: Boolean, default: false },
+  passwordHash: { type: String }, // Hashed access password (if protected)
+  isOneTime: { type: Boolean, default: false },
+  isUsed: { type: Boolean, default: false },
+  expiresAt: { type: Date }, // Optional time-based expiration
+  isRevoked: { type: Boolean, default: false },
+  viewCount: { type: Number, default: 0 },
+  createdAt: Date
+}
+```
+
+---
+
+## 🔄 Core Workflows & Logic
+
+### 1. Share Link Flow
+1. **Link Creation**: The authenticated note owner selects share options (password, one-time access, expiration date) and sends a `POST /api/share/[token]` request.
+2. **Token Generation**: A cryptographically random UUID token is generated for the share link.
+3. **Access Phase**: When a recipient navigates to `/share/[token]`:
+   - System checks if link exists.
+   - System checks if link `isRevoked`, `isExpired`, or already `isUsed`.
+   - If password-protected, prompts user for password input.
+4. **Validation & Unlock**: Once validated, the system performs an atomic view count increment and delivers note content to the recipient.
+
+### 2. Password / Key Generation Logic
+- **Share Tokens**: Cryptographically secure UUIDs generated using Node's `crypto.randomUUID()` to prevent token guessing.
+- **Account & Share Passwords**: Passwords (both user account passwords and optional note access passwords) are hashed using `bcryptjs` with salt rounds before being written to the database. Raw passwords are never stored.
+
+### 3. Expiry Logic
+- Time-based expiration uses the `expiresAt` field in the `Share` document.
+- Upon access (`GET /api/share/[token]`), the server compares current system time against `expiresAt`:
+  ```typescript
+  if (share.expiresAt && new Date(share.expiresAt) < new Date()) {
+    return buildResponse(errorResult("Share link has expired"), 410);
+  }
+  ```
+
+### 4. Invalidate / Revoke Logic
+- Note owners can revoke share links at any time via `DELETE /api/share/[token]`.
+- Revocation updates `isRevoked: true` on the target share document.
+- On subsequent access attempts, the server rejects requests with HTTP 410 GONE if `isRevoked === true`.
+
+### 5. View Count Logic
+- Every successful access increments the `viewCount` field.
+- To avoid read-modify-write race conditions, view counts are updated using MongoDB's atomic `$inc` operator:
+  ```typescript
+  { $inc: { viewCount: 1 } }
+  ```
+
+### 6. Race-Condition Handling
+- **The Problem**: If two users attempt to open a single-use ("one-time") share link simultaneously, a standard "check then update" approach could allow both requests to pass.
+- **The Solution**: SNotes uses MongoDB's atomic `findOneAndUpdate` with conditional query criteria:
+  ```typescript
+  const updatedShare = await Share.findOneAndUpdate(
+    {
+      _id: share._id,
+      isRevoked: false,
+      isUsed: false, // Ensure link has NOT been used yet
+    },
+    {
+      $inc: { viewCount: 1 },
+      ...(share.isOneTime ? { $set: { isUsed: true } } : {}),
+    },
+    { new: true }
+  );
+
+  if (!updatedShare) {
+    // Second concurrent request gets null because isUsed is now true
+    return buildResponse(errorResult("Link already used"), 410);
+  }
+  ```
+  Because MongoDB guarantees atomicity for single-document updates, only the first request succeeds in setting `isUsed: true`. The second concurrent request fails to match the query and receives `null`.
+
+---
+
+## ❓ Technical Architecture Q&A
+
+### Q1: How do you prevent two users from using a one-time link at the same time?
+**Answer**: By executing an atomic `findOneAndUpdate` in MongoDB with the query condition `{ _id: share._id, isUsed: false }` and update payload `{ $set: { isUsed: true } }`. Because MongoDB document updates are atomic, only one concurrent thread will succeed in updating `isUsed` from `false` to `true`. The losing request receives a `null` return value and is immediately rejected with HTTP 410 GONE ("Link already used").
+
+### Q2: How do you update view count safely?
+**Answer**: Using MongoDB's atomic `$inc` operator (`{ $inc: { viewCount: 1 } }`) inside `findOneAndUpdate`. This executes directly at the database layer in a single atomic step, avoiding non-atomic read-then-write cycles in JavaScript that could cause lost updates under high concurrency.
+
+### Q3: How would this work if 1 million people opened the link?
+**Answer**:
+1. **Database Load**: Direct database write per read (`$inc: { viewCount: 1 }`) would bottleneck MongoDB under 1M concurrent hits.
+2. **CDN / Caching Layer**: Public note content should be cached at the edge (CDN like Cloudflare or in-memory Redis cache) to serve reads in sub-10ms without hitting the primary database.
+3. **Buffered / Async View Counting**: View counts should be pushed to an in-memory queue (Redis / Kafka / SQS) and written to MongoDB in asynchronous batches (e.g., flushing aggregated view increments every 5 seconds).
+4. **Distributed Locking**: For one-time links under extreme scale, use Redis distributed locks (`SETNX` / Redlock) to atomically validate and burn the link in memory before touching the database.
+
+### Q4: How would you prevent brute-force attempts on password-protected links?
+**Answer**:
+1. **Rate Limiting**: Implement sliding-window rate limiting per IP address and token (e.g., using Upstash Redis or Nginx) restricting attempts to max 5 per minute.
+2. **Slow Hashing**: Use `bcryptjs` with an appropriate work factor (salt rounds 10+) to compute password hashes, making automated dictionary attacks computationally expensive.
+3. **Exponential Backoff & Temporary Lockout**: Temporarily block attempts on a token after 5 consecutive failed entries for 15 minutes.
+4. **CAPTCHA Verification**: Trigger a CAPTCHA (e.g. Cloudflare Turnstile or reCAPTCHA) after 3 failed password attempts.
+
+---
+
+## 📡 API Reference
 
 ### Authentication
-
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
 | `POST` | `/api/auth/register` | Register a new user | No |
@@ -139,7 +216,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `GET` | `/api/auth/me` | Fetch authenticated user profile | Yes |
 
 ### Notes
-
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
 | `GET` | `/api/notes` | Get all notes created by user | Yes |
@@ -149,7 +225,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `DELETE` | `/api/notes/[id]` | Delete a note | Yes |
 
 ### Share Management
-
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|:---:|
 | `POST` | `/api/share/[token]` | Generate/configure share link | Yes |
@@ -159,26 +234,17 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Security Standards
+## 📜 Available Scripts
 
-- **Server-side Data Validation**: All inputs are checked using **Zod** schemas.
-- **HttpOnly Cookie Storage**: Prevents client-side scripts from reading authentication tokens.
-- **Independent Password Hashing**: Shared note passwords are separately hashed using **bcryptjs** before storage.
-- **Race Condition Safety**: Uses atomic MongoDB updates (`$set`, `$inc`) when marking one-time links as used to ensure single-access guarantees under high concurrent traffic.
-
----
-
-## Available Scripts
-
-| Script | Command | Description |
-|---|---|---|
-| `dev` | `npm run dev` | Runs the development server at `http://localhost:3000` |
-| `build` | `npm run build` | Compiles the Next.js app for production deployment |
-| `start` | `npm run start` | Launches the compiled production build |
-| `lint` | `npm run lint` | Runs ESLint checks across the codebase |
+| Command | Action |
+|---|---|
+| `npm run dev` | Starts development server at `http://localhost:3000` |
+| `npm run build` | Builds production bundle |
+| `npm run start` | Runs production server |
+| `npm run lint` | Executes ESLint checks |
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
