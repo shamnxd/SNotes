@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/mongodb";
 import Note from "@/models/Note";
@@ -5,7 +6,7 @@ import Share from "@/models/Share";
 import { createNoteSchema } from "@/lib/validations";
 import { HTTP_STATUS } from "@/lib/constants/statusCodes";
 import { MESSAGES } from "@/lib/constants/messages";
-import { successResult, errorResult, buildResponse } from "@/lib/types/api";
+import { errorResult, buildResponse } from "@/lib/types/api";
 
 export async function GET(req: Request) {
   try {
@@ -19,8 +20,27 @@ export async function GET(req: Request) {
 
     await connectToDatabase();
 
-    const notes = await Note.find({ userId: authUser.userId })
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "9", 10);
+    const skip = (page - 1) * limit;
+
+    const filter: any = { userId: authUser.userId };
+    if (search.trim()) {
+      filter.$or = [
+        { title: { $regex: search.trim(), $options: "i" } },
+        { content: { $regex: search.trim(), $options: "i" } },
+      ];
+    }
+
+    const totalNotes = await Note.countDocuments(filter);
+    const totalPages = Math.ceil(totalNotes / limit) || 1;
+
+    const notes = await Note.find(filter)
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     const noteIds = notes.map((n) => n._id);
@@ -49,10 +69,16 @@ export async function GET(req: Request) {
       share: shareMap.get(note._id.toString()) || null,
     }));
 
-    return buildResponse(
-      successResult(formattedNotes, MESSAGES.NOTE.FETCH_SUCCESS),
-      HTTP_STATUS.OK
-    );
+    return NextResponse.json({
+      success: true,
+      data: formattedNotes,
+      pagination: {
+        totalNotes,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    });
   } catch (error) {
     console.error("Fetch Notes Error:", error);
     return buildResponse(
@@ -101,10 +127,11 @@ export async function POST(req: Request) {
       updatedAt: newNote.updatedAt,
     };
 
-    return buildResponse(
-      successResult(noteData, MESSAGES.NOTE.CREATED_SUCCESS),
-      HTTP_STATUS.CREATED
-    );
+    return NextResponse.json({
+      success: true,
+      data: noteData,
+      message: MESSAGES.NOTE.CREATED_SUCCESS,
+    });
   } catch (error) {
     console.error("Create Note Error:", error);
     return buildResponse(

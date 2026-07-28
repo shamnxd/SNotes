@@ -3,20 +3,43 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
-import Logo from "@/components/Logo";
-import { ArrowRight, AlertCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    fetch("/api/auth/me").then((res) => {
+      if (res.ok) {
+        router.replace("/dashboard");
+      }
+    });
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
+
+    const newFieldErrors: { email?: string; password?: string } = {};
+    if (!email.trim()) {
+      newFieldErrors.email = "Please enter your email address.";
+    }
+    if (!password.trim()) {
+      newFieldErrors.password = "Please enter your password.";
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      setError("Please fill out all required fields.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -29,7 +52,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok || data.success === false) {
-        throw new Error(data.message || data.error || "Login failed");
+        throw new Error(data.message || data.error || "Invalid email or password");
       }
 
       router.push("/dashboard");
@@ -42,15 +65,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
-      <Header />
-
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans">
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm">
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 border border-blue-100">
-              <Logo className="w-8 h-8" fill="#2F8CFF" />
-            </div>
+        <div className="w-full max-w-md">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors mb-6 cursor-pointer group"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            <span>Go to Home</span>
+          </Link>
+
+          <div className="flex flex-col items-start text-left mb-8">
             <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               Welcome back
             </h1>
@@ -60,25 +86,34 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-sm flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                 Email Address
               </label>
               <input
                 type="email"
-                required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                }}
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF] transition-all"
+                className={`w-full px-4 py-3 bg-white border rounded-2xl text-sm text-slate-900 placeholder-slate-400 outline-none transition-all ${
+                  fieldErrors.email
+                    ? "border-rose-300 focus:border-rose-500 ring-1 ring-rose-500/20"
+                    : "border-slate-200 focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+                }`}
               />
+              {fieldErrors.email && (
+                <p className="text-xs text-rose-500 font-medium mt-1.5">{fieldErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -87,12 +122,21 @@ export default function LoginPage() {
               </label>
               <input
                 type="password"
-                required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                }}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF] transition-all"
+                className={`w-full px-4 py-3 bg-white border rounded-2xl text-sm text-slate-900 placeholder-slate-400 outline-none transition-all ${
+                  fieldErrors.password
+                    ? "border-rose-300 focus:border-rose-500 ring-1 ring-rose-500/20"
+                    : "border-slate-200 focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+                }`}
               />
+              {fieldErrors.password && (
+                <p className="text-xs text-rose-500 font-medium mt-1.5">{fieldErrors.password}</p>
+              )}
             </div>
 
             <button
@@ -105,7 +149,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-8 text-center text-xs text-slate-500">
+          <div className="mt-8 text-left text-xs text-slate-500">
             Don't have an account?{" "}
             <Link
               href="/register"

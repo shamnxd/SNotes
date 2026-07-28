@@ -2,11 +2,8 @@
 
 import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
-import Logo from "@/components/Logo";
 import {
   AlertTriangle,
-  Check,
-  Copy,
   ArrowRight,
   ShieldAlert,
 } from "lucide-react";
@@ -29,10 +26,8 @@ export default function ShareAccessPage({
   const [errorMessage, setErrorMessage] = useState("");
   const [note, setNote] = useState<SharedNote | null>(null);
 
-  // Password Unlock State
   const [password, setPassword] = useState("");
   const [unlocking, setUnlocking] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const checkShareAccess = async () => {
     try {
@@ -61,8 +56,14 @@ export default function ShareAccessPage({
 
   const handleUnlockPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUnlocking(true);
     setErrorMessage("");
+
+    if (!password.trim()) {
+      setErrorMessage("Please enter access password to unlock.");
+      return;
+    }
+
+    setUnlocking(true);
 
     try {
       const res = await fetch(`/api/share/${token}`, {
@@ -86,95 +87,71 @@ export default function ShareAccessPage({
     }
   };
 
-  const copyNoteContent = () => {
-    if (!note?.content) return;
-    navigator.clipboard.writeText(note.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
-      {/* Header */}
-      <header className="border-b border-slate-200/80 bg-white">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <Logo className="w-9 h-9" fill="#2F8CFF" />
-            <div>
-              <div className="text-xl font-extrabold tracking-tight text-[#2F8CFF] leading-none">
-                SNotes
-              </div>
-              <div className="text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
-                Digital Serenity
-              </div>
-            </div>
-          </Link>
-          <span className="text-xs font-semibold text-[#2F8CFF] bg-blue-50 border border-blue-100 px-3.5 py-1 rounded-full">
-            Encrypted Note Share
-          </span>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-12 flex flex-col items-center justify-center">
         {status === SHARE_STATUS.LOADING && (
-          <div className="w-full max-w-lg bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm text-center animate-pulse">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 mx-auto mb-4" />
-            <div className="h-4 bg-slate-100 rounded w-1/2 mx-auto mb-2" />
-            <div className="h-3 bg-slate-100 rounded w-3/4 mx-auto" />
+          <div className="w-full max-w-md text-center my-auto animate-pulse space-y-4">
+            <div className="h-6 bg-slate-100 rounded-full w-1/2 mx-auto" />
+            <div className="h-4 bg-slate-100 rounded w-3/4 mx-auto" />
+            <div className="h-12 bg-slate-100 rounded-2xl w-full" />
           </div>
         )}
 
-        {/* Password Prompt Card */}
         {status === SHARE_STATUS.PASSWORD_REQUIRED && (
-          <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm">
-            <div className="flex flex-col items-center text-center mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 border border-blue-100">
-                <Logo className="w-8 h-8" fill="#2F8CFF" />
-              </div>
+          <div className="w-full max-w-md my-auto">
+            <div className="flex flex-col items-center text-center mb-8">
               <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                 Password Protected
               </h1>
               <p className="text-sm text-slate-500 mt-1">
-                Enter the access password to view this note.
+                Enter the access password to view this note
               </p>
             </div>
 
             {errorMessage && (
-              <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-sm flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
+              <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
-            <form onSubmit={handleUnlockPassword} className="flex flex-col gap-4">
+            <form noValidate onSubmit={handleUnlockPassword} className="flex flex-col gap-5">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2 text-left">
                   Access Password
                 </label>
                 <input
                   type="password"
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password..."
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF] transition-all"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={unlocking}
-                className="w-full py-3.5 px-4 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="mt-2 w-full py-3.5 px-4 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white font-semibold text-sm rounded-full shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {unlocking ? "Unlocking..." : "Unlock Note"}
                 {!unlocking && <ArrowRight className="w-4 h-4" />}
               </button>
             </form>
+
+            <div className="mt-8 text-center text-xs text-slate-500">
+              Want to create secret notes?{" "}
+              <Link
+                href="/"
+                className="font-semibold text-[#2F8CFF] hover:underline"
+              >
+                Get started for free
+              </Link>
+            </div>
           </div>
         )}
 
-        {/* Error States */}
         {[
           SHARE_STATUS.INVALID,
           SHARE_STATUS.REVOKED,
@@ -183,48 +160,37 @@ export default function ShareAccessPage({
           SHARE_STATUS.ERROR,
           SHARE_STATUS.NOT_FOUND,
         ].includes(status as any) && (
-          <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm text-center">
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 border border-rose-200">
+          <div className="w-full max-w-md my-auto text-center flex flex-col items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mb-4 border border-rose-200">
               <ShieldAlert className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-extrabold text-slate-900 mb-2">
+            <h2 className="text-2xl font-extrabold text-slate-900 mb-2 tracking-tight">
               Link Unavailable
             </h2>
-            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-              {errorMessage || "This share link is no longer active."}
+            <p className="text-sm text-slate-500 mb-8 leading-relaxed max-w-sm">
+              {errorMessage || "This one-time share link has already been accessed or expired."}
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-black text-white font-semibold text-sm rounded-full transition-all"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white font-semibold text-xs rounded-full shadow-xs transition-all cursor-pointer"
             >
-              Go to Home Page
+              <span>Return to Home</span>
             </Link>
           </div>
         )}
 
-        {/* Note Content Display */}
         {status === SHARE_STATUS.SUCCESS && note && (
-          <div className="w-full max-w-3xl bg-white border border-slate-200/80 rounded-3xl p-8 shadow-sm">
-            <div className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
-              <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  {note.title}
-                </h1>
-                <p className="text-xs text-slate-400 mt-1">
-                  Shared on {new Date(note.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-
-              <button
-                onClick={copyNoteContent}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#2F8CFF] bg-blue-50 border border-blue-100 hover:bg-blue-100 rounded-full transition-all"
-              >
-                {copied ? <Check className="w-4 h-4 text-[#2F8CFF]" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? "Copied!" : "Copy Content"}</span>
-              </button>
+          <div className="w-full max-w-4xl self-start pt-4">
+            <div className="mb-6 pb-6 border-b border-zinc-100">
+              <h1 className="text-2xl md:text-3xl font-medium text-zinc-800 tracking-tight">
+                {note.title}
+              </h1>
+              <p className="text-xs text-zinc-500 tracking-tight mt-1.5">
+                Shared on {new Date(note.createdAt).toLocaleDateString()}
+              </p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 font-mono text-sm text-slate-900 whitespace-pre-wrap leading-relaxed">
+            <div className="w-full bg-slate-50/50 border border-zinc-200 rounded-2xl p-6 font-mono text-xs md:text-sm text-zinc-800 whitespace-pre-wrap leading-relaxed">
               {note.content}
             </div>
           </div>
