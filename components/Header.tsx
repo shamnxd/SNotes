@@ -3,18 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import Logo from "@/components/Logo";
 import {
-  Lock,
   LogOut,
   Plus,
-  FileText,
   Search,
   Bell,
-  Sun,
-  Moon,
-  User as UserIcon,
 } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
 
 interface HeaderUser {
   id: string;
@@ -25,7 +20,6 @@ interface HeaderUser {
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState<HeaderUser | null>(null);
 
   useEffect(() => {
@@ -51,18 +45,16 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white dark:bg-[#151D2A] border-b border-slate-200/80 dark:border-slate-800 sticky top-0 z-40 transition-colors duration-200">
+    <header className="w-full bg-white border-b border-slate-200/80 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3 group shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-[#00C48C] flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:bg-[#00A876] transition-colors">
-            <Lock className="w-5 h-5 text-white stroke-[2.5]" />
-          </div>
+          <Logo className="w-9 h-9 transition-transform group-hover:scale-105" fill="#00C48C" />
           <div>
             <div className="text-xl font-extrabold tracking-tight text-[#00C48C] leading-none">
               SecureNote
             </div>
-            <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500 tracking-wider uppercase mt-0.5">
+            <div className="text-[10px] font-medium text-slate-400 tracking-wider uppercase mt-0.5">
               Digital Serenity
             </div>
           </div>
@@ -75,32 +67,19 @@ export default function Header() {
             <input
               type="text"
               placeholder="Search secure notes..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-100/70 dark:bg-slate-800/70 focus:bg-white dark:focus:bg-slate-800 border border-transparent focus:border-[#00C48C] rounded-full text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-slate-100/70 focus:bg-white border border-transparent focus:border-[#00C48C] rounded-full text-sm text-slate-800 placeholder-slate-400 outline-none transition-all"
             />
           </div>
         )}
 
         {/* Navigation & Profile Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Theme Switcher Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            title={theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-          >
-            {theme === "dark" ? (
-              <Sun className="w-5 h-5 text-amber-400" />
-            ) : (
-              <Moon className="w-5 h-5 text-slate-600" />
-            )}
-          </button>
-
+        <div className="flex items-center gap-3">
           {user ? (
             <>
               {/* Notification Bell */}
-              <button className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">
+              <button className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors relative">
                 <Bell className="w-5 h-5" />
-                <span className="w-2 h-2 bg-[#00C48C] rounded-full absolute top-1.5 right-1.5 ring-2 ring-white dark:ring-slate-900" />
+                <span className="w-2 h-2 bg-[#00C48C] rounded-full absolute top-1.5 right-1.5 ring-2 ring-white" />
               </button>
 
               {/* Create Note Button */}
@@ -109,20 +88,20 @@ export default function Header() {
                 className="px-4 py-2 text-sm font-semibold text-white bg-[#00C48C] hover:bg-[#00A876] rounded-xl shadow-sm transition-all flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4 stroke-[2.5]" />
-                <span className="hidden sm:inline">Create Note</span>
+                <span>Create Note</span>
               </Link>
 
-              <div className="h-5 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+              <div className="h-5 w-[1px] bg-slate-200 mx-1 hidden sm:block" />
 
               {/* User Avatar & Logout */}
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#E6F8F2] dark:bg-[#00C48C]/20 text-[#059669] dark:text-[#00E5A3] font-bold text-xs flex items-center justify-center ring-2 ring-[#00C48C]/20">
+                <div className="w-8 h-8 rounded-full bg-[#E6F8F2] text-[#059669] font-bold text-xs flex items-center justify-center ring-2 ring-[#00C48C]/20">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <button
                   onClick={handleLogout}
                   title="Log Out"
-                  className="p-2 text-slate-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                  className="p-2 text-slate-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -132,7 +111,7 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="px-3.5 py-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
               >
                 Log in
               </Link>
