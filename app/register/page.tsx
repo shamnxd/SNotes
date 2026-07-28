@@ -42,25 +42,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFC] text-[#18181B] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
       <Header />
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md bg-white border border-[#E4E4E7] rounded-2xl p-8 shadow-sm">
+        <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl p-8 shadow-sm">
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-[#FFF0E6] text-[#FA661A] flex items-center justify-center mb-4 border border-[#FFD5C0]">
+            <div className="w-12 h-12 rounded-2xl bg-[#E6F8F2] text-[#00C48C] flex items-center justify-center mb-4 border border-[#A7F3D0]">
               <Lock className="w-6 h-6 stroke-[2.5]" />
             </div>
-            <h1 className="text-2xl font-extrabold text-[#18181B] tracking-tight">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               Create your account
             </h1>
-            <p className="text-sm text-[#6B7280] mt-1">
+            <p className="text-sm text-slate-500 mt-1">
               Start sharing encrypted notes securely
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
+            <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -68,7 +68,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
-              <label className="block text-xs font-semibold text-[#18181B] uppercase tracking-wider mb-2">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                 Full Name
               </label>
               <input
@@ -77,12 +77,12 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Jane Doe"
-                className="w-full px-4 py-2.5 bg-white border border-[#E4E4E7] rounded-xl text-sm text-[#18181B] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FA661A] focus:ring-1 focus:ring-[#FA661A] transition-all"
+                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#00C48C] focus:ring-1 focus:ring-[#00C48C] transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18181B] uppercase tracking-wider mb-2">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                 Email Address
               </label>
               <input
@@ -91,12 +91,12 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-2.5 bg-white border border-[#E4E4E7] rounded-xl text-sm text-[#18181B] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FA661A] focus:ring-1 focus:ring-[#FA661A] transition-all"
+                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#00C48C] focus:ring-1 focus:ring-[#00C48C] transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#18181B] uppercase tracking-wider mb-2">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                 Password
               </label>
               <input
@@ -105,25 +105,25 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 6 characters"
-                className="w-full px-4 py-2.5 bg-white border border-[#E4E4E7] rounded-xl text-sm text-[#18181B] placeholder-[#9CA3AF] focus:outline-none focus:border-[#FA661A] focus:ring-1 focus:ring-[#FA661A] transition-all"
+                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#00C48C] focus:ring-1 focus:ring-[#00C48C] transition-all"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full py-3 px-4 bg-[#FA661A] hover:bg-[#E0530C] text-white font-semibold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="mt-2 w-full py-3 px-4 bg-[#00C48C] hover:bg-[#00A876] text-white font-semibold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? "Creating account..." : "Create Account"}
               {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
           </form>
 
-          <div className="mt-8 text-center text-xs text-[#6B7280]">
+          <div className="mt-8 text-center text-xs text-slate-500">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold text-[#FA661A] hover:underline"
+              className="font-semibold text-[#00C48C] hover:underline"
             >
               Sign in
             </Link>
