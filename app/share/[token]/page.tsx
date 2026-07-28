@@ -81,7 +81,7 @@ export default function ShareAccessPage({
     } catch (err) {
       console.error(err);
       setErrorMessage("An error occurred while unlocking.");
-    } fiudinally {
+    } finally {
       setUnlocking(false);
     }
   };
