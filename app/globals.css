@@ -9,6 +9,16 @@
   --primary-text: #059669;
 }
 
+html.dark {
+  --background: #0b0f17;
+  --foreground: #f8fafc;
+  --primary: #00c48c;
+  --primary-hover: #00a876;
+  --primary-light: rgba(0, 196, 140, 0.15);
+  --primary-text: #00e5a3;
+  color-scheme: dark;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -36,6 +46,10 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 9999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 
 ::-webkit-scrollbar-thumb:hover {
