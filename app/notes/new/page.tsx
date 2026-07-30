@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
@@ -30,7 +30,7 @@ export default function NewNotePage() {
     expiresAt?: string;
   }>({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetch("/api/auth/me").then((res) => {
       if (res.status === 401) {
         router.push("/login?callbackUrl=/notes/new");
