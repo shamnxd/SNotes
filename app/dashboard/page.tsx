@@ -41,25 +41,21 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
-  // Search and Debounce State
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // 300ms Debounce effect for search query input
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setCurrentPage(1); // Reset to page 1 on new search term
+      setCurrentPage(1);
     }, 300);
 
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Fetch Notes from Backend with Search & Pagination query params
   const fetchNotes = useCallback(async () => {
     setLoading(true);
     try {

@@ -50,17 +50,14 @@ export default function NoteDetailPage({
   const [copied, setCopied] = useState(false);
   const [showRevokeModal, setShowRevokeModal] = useState(false);
 
-  // Share link config state
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [sharePassword, setSharePassword] = useState("");
   const [isOneTime, setIsOneTime] = useState(false);
   const [expiresAt, setExpiresAt] = useState("");
 
-  // Status / error messages
   const [statusMsg, setStatusMsg] = useState("");
   const [error, setError] = useState("");
 
-  // Format current datetime as YYYY-MM-DDTHH:mm for datetime-local min attribute
   const getMinDateTime = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -183,7 +180,6 @@ export default function NoteDetailPage({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ── Loading skeleton ──────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans">

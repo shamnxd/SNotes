@@ -15,7 +15,6 @@ export default function NewNotePage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  // Share Configuration Options
   const [enableShare, setEnableShare] = useState(true);
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [sharePassword, setSharePassword] = useState("");
@@ -39,7 +38,6 @@ export default function NewNotePage() {
     });
   }, [router]);
 
-  // Format current datetime as YYYY-MM-DDTHH:mm for datetime-local min attribute
   const getMinDateTime = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -87,7 +85,6 @@ export default function NewNotePage() {
     setLoading(true);
 
     try {
-      // 1. Create Note
       const noteRes = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -102,7 +99,6 @@ export default function NewNotePage() {
       const createdNote = noteJson.data || noteJson.note;
       const noteId = createdNote.id;
 
-      // 2. Generate Share Link if enabled
       if (enableShare) {
         await fetch(`/api/notes/${noteId}/share`, {
           method: "POST",

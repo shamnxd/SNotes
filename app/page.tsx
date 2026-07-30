@@ -9,7 +9,6 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  // Features list formatted for SNotes with Electric Azure Blue (#2F8CFF) SVG Icons
   const features = [
     {
       icon: (
@@ -121,7 +120,6 @@ export default function Home() {
     },
   ];
 
-  // Testimonials state and logic
   const testimonials = [
     {
       id: 1,
