@@ -189,6 +189,7 @@ export default function DashboardPage() {
               return (
                 <div
                   key={note.id}
+                  onClick={() => router.push(`/notes/${note.id}`)}
                   className="relative p-6 md:p-8 flex flex-col justify-between gap-4 border-r border-b border-zinc-200 bg-white hover:bg-gradient-to-b hover:from-white hover:to-[#EBF3FF] transition-all duration-300 cursor-pointer min-h-[220px]"
                 >
                   <div className="space-y-3">

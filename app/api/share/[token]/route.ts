@@ -56,7 +56,6 @@ export async function GET(
       );
     }
 
-    // Public Share Access — Atomic Update
     const updatedShare = await Share.findOneAndUpdate(
       {
         _id: share._id,
@@ -173,7 +172,6 @@ export async function POST(
       }
     }
 
-    // Atomic update
     const updatedShare = await Share.findOneAndUpdate(
       {
         _id: share._id,

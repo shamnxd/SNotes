@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { HTTP_STATUS, HttpStatusCode } from "../constants/statusCodes";
 
-// Generic API Response Interface
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
   data: T;
 }
 
-// Discriminated Union Result Type
 export type Result<T> =
   | {
         success: true;
@@ -20,7 +18,6 @@ export type Result<T> =
         message: string;
     };
 
-// Result Helper Builders
 export function successResult<T>(data: T, message: string = "Success"): Result<T> {
   return {
     success: true,
@@ -36,7 +33,6 @@ export function errorResult<T = never>(message: string): Result<T> {
   };
 }
 
-// Helper to convert Result<T> directly into a standardized NextResponse<ApiResponse<T>>
 export function buildResponse<T>(
   result: Result<T>,
   status?: HttpStatusCode,

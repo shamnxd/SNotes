@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import {
   ArrowLeft,
   Save,
-  Share2,
   Copy,
   Check,
   Eye,
+  AlertCircle,
+  Link2,
 } from "lucide-react";
 
 interface NoteShare {
@@ -45,14 +47,29 @@ export default function NoteDetailPage({
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showRevokeModal, setShowRevokeModal] = useState(false);
 
   // Share link config state
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [sharePassword, setSharePassword] = useState("");
   const [isOneTime, setIsOneTime] = useState(false);
   const [expiresAt, setExpiresAt] = useState("");
-  const [copied, setCopied] = useState(false);
+
+  // Status / error messages
   const [statusMsg, setStatusMsg] = useState("");
+  const [error, setError] = useState("");
+
+  // Format current datetime as YYYY-MM-DDTHH:mm for datetime-local min attribute
+  const getMinDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   const fetchNote = async () => {
     try {
@@ -92,6 +109,7 @@ export default function NoteDetailPage({
     e.preventDefault();
     setSaving(true);
     setStatusMsg("");
+    setError("");
 
     try {
       const res = await fetch(`/api/notes/${id}`, {
@@ -101,11 +119,13 @@ export default function NoteDetailPage({
       });
       const json = await res.json();
       if (res.ok && json.success !== false) {
-        setStatusMsg(json.message || "Note updated successfully");
+        setStatusMsg(json.message || "Note updated successfully.");
         fetchNote();
+      } else {
+        setError(json.message || "Failed to update note.");
       }
     } catch (err) {
-      console.error(err);
+      setError("An error occurred while saving.");
     } finally {
       setSaving(false);
     }
@@ -113,6 +133,7 @@ export default function NoteDetailPage({
 
   const handleGenerateShare = async () => {
     setStatusMsg("");
+    setError("");
     try {
       const res = await fetch(`/api/notes/${id}/share`, {
         method: "POST",
@@ -126,26 +147,31 @@ export default function NoteDetailPage({
       });
       const json = await res.json();
       if (res.ok && json.success !== false) {
-        setStatusMsg(json.message || "Share link generated/updated successfully");
+        setStatusMsg(json.message || "Share link generated/updated successfully.");
         fetchNote();
+      } else {
+        setError(json.message || "Failed to generate share link.");
       }
     } catch (err) {
-      console.error(err);
+      setError("An error occurred.");
     }
   };
 
   const handleRevokeShare = async () => {
-    if (!confirm("Are you sure you want to revoke this share link?")) return;
-
+    setShowRevokeModal(false);
+    setStatusMsg("");
+    setError("");
     try {
       const res = await fetch(`/api/notes/${id}/revoke`, { method: "POST" });
       const json = await res.json();
       if (res.ok && json.success !== false) {
         setStatusMsg(json.message || "Share link revoked.");
         fetchNote();
+      } else {
+        setError(json.message || "Failed to revoke share link.");
       }
     } catch (err) {
-      console.error(err);
+      setError("An error occurred.");
     }
   };
 
@@ -157,182 +183,291 @@ export default function NoteDetailPage({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // ── Loading skeleton ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFC] text-[#18181B] flex flex-col font-sans">
+      <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans">
         <Header />
-        <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-12">
-          <div className="h-64 bg-white border border-[#E4E4E7] rounded-2xl animate-pulse" />
+        <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
+          <div className="h-8 w-32 bg-slate-100 rounded animate-pulse mb-8" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-8 space-y-6">
+              <div className="h-11 bg-slate-100 rounded-2xl animate-pulse" />
+              <div className="h-64 bg-slate-100 rounded-2xl animate-pulse" />
+            </div>
+            <div className="lg:col-span-4 space-y-4">
+              <div className="h-6 w-40 bg-slate-100 rounded animate-pulse" />
+              <div className="h-8 bg-slate-100 rounded animate-pulse" />
+              <div className="h-8 bg-slate-100 rounded animate-pulse" />
+            </div>
+          </div>
         </main>
       </div>
     );
   }
 
+  const hasActiveShare = note?.share?.token && !note.share.isRevoked;
+
   return (
-    <div className="min-h-screen bg-[#FAFAFC] text-[#18181B] flex flex-col font-sans">
+    <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-10">
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#737373] hover:text-[#18181B] transition-colors mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dashboard</span>
-        </button>
+      {/* Main Container — same max-w-6xl as Create Note */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
+        {/* Top Header Row */}
+        <div className="flex items-center justify-between mb-8">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors group cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            <span>Back to My Notes</span>
+          </Link>
 
+          <h1 className="text-xl font-medium text-zinc-800 tracking-tight">
+            Edit Secret Note
+          </h1>
+        </div>
+
+        {/* Success / Error Banners */}
         {statusMsg && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium">
-            {statusMsg}
+          <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium flex items-center gap-2">
+            <Check className="w-4 h-4 shrink-0 text-emerald-500" />
+            <span>{statusMsg}</span>
+          </div>
+        )}
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-medium flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <span>{error}</span>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Main Note Editor */}
-          <div className="md:col-span-2 bg-white border border-[#E4E4E7] rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-extrabold text-[#18181B] mb-6">
-              Edit Note
-            </h2>
+        {/* 2-Column Sidebar Layout — same as Create Note */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Main Editor Section (Left — Span 8) */}
+          <form
+            noValidate
+            onSubmit={handleUpdate}
+            className="lg:col-span-8 space-y-6"
+          >
+            <div>
+              <label className="block text-xs font-medium text-zinc-600 uppercase tracking-wider mb-2">
+                Note Title
+              </label>
+              <input
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Secret API Keys & Staging Passwords"
+                className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-2xl text-sm font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+              />
+            </div>
 
-            <form onSubmit={handleUpdate} className="flex flex-col gap-5">
-              <div>
-                <label className="block text-xs font-semibold text-[#18181B] uppercase tracking-wider mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white border border-[#E4E4E7] rounded-xl text-sm font-semibold focus:outline-none focus:border-[#FA661A]"
-                />
-              </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-600 uppercase tracking-wider mb-2">
+                Encrypted Content
+              </label>
+              <textarea
+                required
+                rows={14}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Type or paste your sensitive note, secret text, or code snippet here..."
+                className="w-full p-4 bg-slate-50/50 border border-zinc-200 rounded-2xl text-xs font-mono text-zinc-800 placeholder-zinc-400 outline-none transition-all leading-relaxed focus:border-[#2F8CFF] focus:bg-white focus:ring-1 focus:ring-[#2F8CFF]"
+              />
+            </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[#18181B] uppercase tracking-wider mb-2">
-                  Content
-                </label>
-                <textarea
-                  required
-                  rows={12}
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white border border-[#E4E4E7] rounded-xl text-sm font-mono focus:outline-none focus:border-[#FA661A]"
-                />
-              </div>
-
+            {/* Save Button */}
+            <div className="pt-2 flex gap-2">
               <button
                 type="submit"
                 disabled={saving}
-                className="self-end px-5 py-2.5 bg-[#FA661A] hover:bg-[#E0530C] text-white font-semibold text-sm rounded-xl shadow-sm transition-all flex items-center gap-2"
+                className="px-5 py-2.5 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white text-xs font-medium rounded-full transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-3.5 h-3.5" />
                 <span>{saving ? "Saving..." : "Save Changes"}</span>
               </button>
-            </form>
-          </div>
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard")}
+                className="px-5 py-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-white hover:bg-slate-50 transition-all rounded-full cursor-pointer border border-zinc-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
 
-          {/* Share Link Management Sidebar */}
-          <div className="flex flex-col gap-6">
-            <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-extrabold text-[#18181B] flex items-center gap-2">
-                  <Share2 className="w-4 h-4 text-[#FA661A]" />
-                  <span>Share Manager</span>
-                </h3>
-                <span className="flex items-center gap-1 text-xs font-bold text-[#18181B]" title="Total successful views">
-                  <Eye className="w-3.5 h-3.5 text-[#FA661A]" />
-                  <span>{note?.share?.viewCount || 0} views</span>
-                </span>
-              </div>
+          {/* Right Sidebar — same structure as Create Note */}
+          <aside className="lg:col-span-4 space-y-6">
+            <div className="border-b border-zinc-100 pb-4">
+              <h2 className="text-sm font-medium text-zinc-800 tracking-tight">
+                Sharing &amp; Security Settings
+              </h2>
+            </div>
 
-              {note?.share?.token && !note.share.isRevoked ? (
-                <div className="flex flex-col gap-4">
-                  <div className="p-3 bg-[#FAFAFC] border border-[#E4E4E7] rounded-xl flex items-center justify-between">
-                    <span className="text-xs font-mono text-[#737373] truncate">
-                      /share/{note.share.token}
-                    </span>
-                    <button
-                      onClick={copyShareUrl}
-                      className="p-1.5 text-[#FA661A] hover:bg-[#FFF0E6] rounded-lg transition-colors"
-                      title="Copy Share Link"
-                    >
-                      {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                  </div>
-
+            {/* Active Share Link Display */}
+            {hasActiveShare && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-zinc-800">Active Share Link</span>
+                  <span className="flex items-center gap-1 text-[11px] text-zinc-500 font-medium">
+                    <Eye className="w-3.5 h-3.5 text-zinc-400" />
+                    {note?.share?.viewCount || 0} views
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 bg-slate-50 border border-zinc-200 rounded-xl">
+                  <Link2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                  <span className="text-[11px] font-mono text-zinc-500 truncate flex-1">
+                    /share/{note?.share?.token}
+                  </span>
                   <button
-                    onClick={handleRevokeShare}
-                    className="w-full py-2 px-3 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors border border-red-200"
+                    onClick={copyShareUrl}
+                    className="p-1 text-[#2F8CFF] hover:bg-blue-50 rounded-lg transition-colors shrink-0"
+                    title="Copy Share Link"
                   >
-                    Revoke Share Link
+                    {copied ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
                   </button>
                 </div>
-              ) : (
-                <p className="text-xs text-[#737373] mb-4">
-                  No active share link. Configure options below to generate a new share link.
-                </p>
-              )}
 
-              {/* Configure Share Settings */}
-              <div className="mt-6 pt-4 border-t border-[#E4E4E7] flex flex-col gap-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#18181B]">
-                  Link Configuration
-                </h4>
+                <button
+                  onClick={() => setShowRevokeModal(true)}
+                  className="w-full py-2 px-3 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-full transition-colors border border-rose-200 cursor-pointer"
+                >
+                  Revoke Share Link
+                </button>
+              </div>
+            )}
 
-                <label className="flex items-center gap-2 text-xs font-semibold text-[#18181B]">
+            {!hasActiveShare && note?.share?.isRevoked && (
+              <p className="text-xs text-zinc-500 bg-zinc-50 border border-zinc-200 rounded-xl p-3">
+                This share link has been revoked. Configure options below to generate a new one.
+              </p>
+            )}
+
+            {!note?.share && (
+              <p className="text-xs text-zinc-500 bg-zinc-50 border border-zinc-200 rounded-xl p-3">
+                No share link yet. Configure options below to generate one.
+              </p>
+            )}
+
+            {/* Divider */}
+            <div className="space-y-4 pt-2 border-t border-zinc-100">
+              {/* One-Time Burn Switch */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-medium text-zinc-800 block">One-Time Burn Link</span>
+                  <p className="text-[11px] text-zinc-500 leading-snug">
+                    Permanently self-destruct after 1 view.
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
                     type="checkbox"
-                    checked={isPasswordProtected}
-                    onChange={(e) => setIsPasswordProtected(e.target.checked)}
-                    className="accent-[#FA661A]"
+                    checked={isOneTime}
+                    onChange={(e) => setIsOneTime(e.target.checked)}
+                    className="sr-only peer"
                   />
-                  <span>Password Protect</span>
+                  <div className="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#2F8CFF]" />
                 </label>
+              </div>
+
+              {/* Password Protection Switch */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-medium text-zinc-800 block">Password Protection</span>
+                    <p className="text-[11px] text-zinc-500 leading-snug">
+                      Require a password to unlock note.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={isPasswordProtected}
+                      onChange={(e) => setIsPasswordProtected(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#2F8CFF]" />
+                  </label>
+                </div>
 
                 {isPasswordProtected && (
                   <input
                     type="password"
                     value={sharePassword}
                     onChange={(e) => setSharePassword(e.target.value)}
-                    placeholder="New password"
-                    className="px-3 py-1.5 bg-white border border-[#E4E4E7] rounded-xl text-xs"
+                    placeholder="Set access password"
+                    className="w-full px-3.5 py-2 bg-white border border-zinc-200 rounded-xl text-xs outline-none transition-all focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
                   />
                 )}
-
-                <label className="flex items-center gap-2 text-xs font-semibold text-[#18181B]">
-                  <input
-                    type="checkbox"
-                    checked={isOneTime}
-                    onChange={(e) => setIsOneTime(e.target.checked)}
-                    className="accent-[#FA661A]"
-                  />
-                  <span>One-Time Link</span>
-                </label>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-semibold text-[#737373]">
-                    Expiration Date
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={expiresAt}
-                    onChange={(e) => setExpiresAt(e.target.value)}
-                    className="px-3 py-1.5 bg-white border border-[#E4E4E7] rounded-xl text-xs"
-                  />
-                </div>
-
-                <button
-                  onClick={handleGenerateShare}
-                  className="w-full py-2 px-3 bg-[#FA661A] hover:bg-[#E0530C] text-white font-semibold text-xs rounded-xl shadow-sm transition-all mt-2"
-                >
-                  Generate / Save Share Link
-                </button>
               </div>
+
+              {/* Expiration Date */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-zinc-800">
+                  Expiration Date (Optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  min={getMinDateTime()}
+                  value={expiresAt}
+                  onChange={(e) => setExpiresAt(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-white border border-zinc-200 rounded-xl text-xs text-zinc-800 outline-none transition-all focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-4 border-t border-zinc-100 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleGenerateShare}
+                className="w-full py-2.5 px-4 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Link2 className="w-3.5 h-3.5" />
+                <span>{hasActiveShare ? "Update Share Link" : "Generate Share Link"}</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </main>
+
+      {showRevokeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowRevokeModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-xl border border-zinc-200 w-full max-w-sm mx-4 p-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-sm font-semibold text-zinc-900">Revoke Share Link?</h3>
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                Anyone with the current link will immediately lose access. You can generate a new share link anytime.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                onClick={handleRevokeShare}
+                className="flex-1 py-2 px-4 bg-rose-500 hover:bg-rose-600 text-white text-xs font-medium rounded-full transition-all cursor-pointer"
+              >
+                Yes, Revoke
+              </button>
+              <button
+                onClick={() => setShowRevokeModal(false)}
+                className="flex-1 py-2 px-4 bg-white hover:bg-slate-50 text-zinc-700 text-xs font-medium rounded-full border border-zinc-200 transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
-      </main>
+      )}
     </div>
   );
 }
