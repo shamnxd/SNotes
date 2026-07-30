@@ -251,13 +251,21 @@ export default function DashboardPage() {
                           </>
                         )}
                       </button>
+                    ) : isRevoked ? (
+                      <span className="text-[11px] text-zinc-400 font-medium">
+                        ● Revoked
+                      </span>
+                    ) : share?.isOneTime && share?.isUsed ? (
+                      <span className="text-[11px] text-amber-500 font-medium">
+                        ● Used
+                      </span>
                     ) : isExpired ? (
-                      <span className="text-[11px] text-rose-600 font-medium">
+                      <span className="text-[11px] text-rose-500 font-medium">
                         ● Expired
                       </span>
                     ) : (
                       <span className="text-[11px] text-zinc-400 font-medium">
-                        ● Revoked
+                        ● No Link
                       </span>
                     )}
                   </div>

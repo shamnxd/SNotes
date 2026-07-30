@@ -202,7 +202,21 @@ export default function NoteDetailPage({
     );
   }
 
-  const hasActiveShare = note?.share?.token && !note.share.isRevoked;
+  const hasActiveShare = note?.share?.token && !note.share.isRevoked && !(note.share.isOneTime && note.share.isUsed) && !(note.share.expiresAt && new Date(note.share.expiresAt) < new Date());
+
+  const isLocked = !!(
+    (note?.share?.isRevoked) ||
+    (note?.share?.isOneTime && note?.share?.isUsed) ||
+    (note?.share?.expiresAt && new Date(note.share.expiresAt) < new Date())
+  );
+
+  const lockReason = note?.share?.isRevoked
+    ? { label: "Revoked", color: "text-zinc-500", bg: "bg-zinc-50 border-zinc-200" }
+    : note?.share?.isOneTime && note?.share?.isUsed
+    ? { label: "Used — One-time link consumed", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" }
+    : note?.share?.expiresAt && new Date(note.share.expiresAt) < new Date()
+    ? { label: "Expired", color: "text-rose-500", bg: "bg-rose-50 border-rose-200" }
+    : null;
 
   return (
     <div className="min-h-screen bg-white text-slate-800 flex flex-col font-sans">
@@ -255,9 +269,14 @@ export default function NoteDetailPage({
                 type="text"
                 required
                 value={title}
+                readOnly={isLocked}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Secret API Keys & Staging Passwords"
-                className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-2xl text-sm font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+                className={`w-full px-4 py-3 bg-white border rounded-2xl text-sm font-medium text-zinc-900 placeholder-zinc-400 outline-none transition-all ${
+                  isLocked
+                    ? "border-zinc-100 bg-zinc-50 text-zinc-500 cursor-not-allowed"
+                    : "border-zinc-200 focus:border-[#2F8CFF] focus:ring-1 focus:ring-[#2F8CFF]"
+                }`}
               />
             </div>
 
@@ -269,30 +288,36 @@ export default function NoteDetailPage({
                 required
                 rows={14}
                 value={content}
+                readOnly={isLocked}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Type or paste your sensitive note, secret text, or code snippet here..."
-                className="w-full p-4 bg-slate-50/50 border border-zinc-200 rounded-2xl text-xs font-mono text-zinc-800 placeholder-zinc-400 outline-none transition-all leading-relaxed focus:border-[#2F8CFF] focus:bg-white focus:ring-1 focus:ring-[#2F8CFF]"
+                className={`w-full p-4 border rounded-2xl text-xs font-mono text-zinc-800 placeholder-zinc-400 outline-none transition-all leading-relaxed ${
+                  isLocked
+                    ? "bg-zinc-50 border-zinc-100 text-zinc-500 cursor-not-allowed"
+                    : "bg-slate-50/50 border-zinc-200 focus:border-[#2F8CFF] focus:bg-white focus:ring-1 focus:ring-[#2F8CFF]"
+                }`}
               />
             </div>
 
-            {/* Save Button */}
-            <div className="pt-2 flex gap-2">
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-5 py-2.5 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white text-xs font-medium rounded-full transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>{saving ? "Saving..." : "Save Changes"}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push("/dashboard")}
-                className="px-5 py-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-white hover:bg-slate-50 transition-all rounded-full cursor-pointer border border-zinc-200"
-              >
-                Cancel
-              </button>
-            </div>
+            {!isLocked && (
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-5 py-2.5 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white text-xs font-medium rounded-full transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{saving ? "Saving..." : "Save Changes"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/dashboard")}
+                  className="px-5 py-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 bg-white hover:bg-slate-50 transition-all rounded-full cursor-pointer border border-zinc-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </form>
 
           {/* Right Sidebar — same structure as Create Note */}
@@ -303,7 +328,13 @@ export default function NoteDetailPage({
               </h2>
             </div>
 
-            {/* Active Share Link Display */}
+            {lockReason && (
+              <div className={`flex items-center gap-2 p-3 rounded-xl border text-xs font-medium ${lockReason.bg} ${lockReason.color}`}>
+                <span className="text-base leading-none">●</span>
+                <span>{lockReason.label}</span>
+              </div>
+            )}
+
             {hasActiveShare && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -340,13 +371,7 @@ export default function NoteDetailPage({
               </div>
             )}
 
-            {!hasActiveShare && note?.share?.isRevoked && (
-              <p className="text-xs text-zinc-500 bg-zinc-50 border border-zinc-200 rounded-xl p-3">
-                This share link has been revoked. Configure options below to generate a new one.
-              </p>
-            )}
-
-            {!note?.share && (
+            {!hasActiveShare && !lockReason && !note?.share && (
               <p className="text-xs text-zinc-500 bg-zinc-50 border border-zinc-200 rounded-xl p-3">
                 No share link yet. Configure options below to generate one.
               </p>
@@ -419,7 +444,6 @@ export default function NoteDetailPage({
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="pt-4 border-t border-zinc-100 flex flex-col gap-2">
               <button
                 type="button"
@@ -427,7 +451,13 @@ export default function NoteDetailPage({
                 className="w-full py-2.5 px-4 bg-[#2F8CFF] hover:bg-[#1E7BE6] text-white text-xs font-medium rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Link2 className="w-3.5 h-3.5" />
-                <span>{hasActiveShare ? "Update Share Link" : "Generate Share Link"}</span>
+                <span>
+                  {isLocked
+                    ? "Reopen Link"
+                    : hasActiveShare
+                    ? "Update Share Link"
+                    : "Generate Share Link"}
+                </span>
               </button>
             </div>
           </aside>
